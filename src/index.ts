@@ -26,8 +26,8 @@ const room = new Room({
   doors: [
     {
       side: RoomSide.top,
-      position: DEFAULT_ROOM_SIZE/2 - 4,
-      length: 8
+      position: DEFAULT_ROOM_SIZE/2 - DEFAULT_ROOM_SIZE/8,
+      length: DEFAULT_ROOM_SIZE/4
     }
   ]
 });
