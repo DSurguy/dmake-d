@@ -1,6 +1,6 @@
 import { Sprite, Texture, BaseTexture } from "pixi.js";
 
-export default function playerSpriteFactory() {
+export function playerSpriteFactory() {
   const canvas = document.createElement("canvas");
   canvas.width = 16;
   canvas.height = 16;
@@ -8,6 +8,12 @@ export default function playerSpriteFactory() {
   if( !ctx ) throw new Error("Unable to generate context for canvas");
   ctx.lineWidth = 2;
   ctx.strokeRect(1, 1, 14, 14);
+
+  ctx.beginPath();
+  ctx.moveTo(3, 13);
+  ctx.lineTo(8,4);
+  ctx.lineTo(13,13);
+  ctx.stroke();
 
   const sprite = new Sprite(new Texture(new BaseTexture(canvas)));
   sprite.anchor.x = 0.5;

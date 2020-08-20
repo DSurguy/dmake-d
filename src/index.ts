@@ -1,6 +1,6 @@
 import "@/style/index.scss";
 import {Application} from "pixi.js";
-import Player from "./classes/entities/Player";
+import Player from "./classes/entities/Player/Player";
 import Room from "./classes/entities/constructs/Room/Room";
 import {DEFAULT_ROOM_SIZE} from "./constants";
 import {RoomSide} from "./classes/entities/constructs/Room/types";
