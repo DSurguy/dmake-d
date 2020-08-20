@@ -1,0 +1,11 @@
+{
+  "name": "dmake-d",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@types/pixi.js": "^5.0.0",
+    "pixi.js": "^5.3.3",
+    "typescript": "^3.9.7"
+  }
+}
