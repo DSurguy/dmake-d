@@ -36,4 +36,13 @@ app.stage.addChild(room.sprite);
 room.sprite.x = app.view.width/2;
 room.sprite.y = app.view.height/2;
 
+/**
+ * TODO
+ *
+ * As a POC for seeing facing work and handling clicks updating user state,
+ * determine the angle between the click point and the current position of the player.
+ *
+ * If the angle is within (45/2) degrees of a facing, set it as such.
+ */
+
 export {}
