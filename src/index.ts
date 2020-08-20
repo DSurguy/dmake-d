@@ -4,6 +4,7 @@ import Player from "./classes/entities/Player/Player";
 import Room from "./classes/entities/constructs/Room/Room";
 import {DEFAULT_ROOM_SIZE} from "./constants";
 import {RoomSide} from "./classes/entities/constructs/Room/types";
+import {PlayerFacing} from "./classes/entities/Player/types";
 
 const app = new Application({
   width: 640,

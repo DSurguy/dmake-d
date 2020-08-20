@@ -1,6 +1,10 @@
 export enum PlayerFacing {
   up,
+  upRight,
   right,
+  downRight,
   down,
-  left
+  downLeft,
+  left,
+  upLeft
 }
