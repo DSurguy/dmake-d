@@ -1,68 +1,62 @@
 import {Point} from "../types";
-
-/**
- * TODO
- *
- * Handle zoom, it appears to skew these positions
- */
+import { Container, InteractionEvent } from "pixi.js";
 
 class MouseDragHandler {
   mousePosition: Point | null = null
   mouseDown = false;
-  private _target: HTMLElement | null = null;
+  private _target: Container | null = null;
+  dragCallbacks: Array<(point: Point) => void> = [];
 
-  attach(target: HTMLElement){
+  attach(target: Container){
     this.detach();
     this._target = target;
-    target.addEventListener("mousedown", this.boundOnMouseDown);
-    target.addEventListener("mousemove", this.boundOnMouseMove);
-    target.addEventListener("mouseup", this.boundOnMouseUp);
-    target.addEventListener("mouseenter", this.boundOnMouseEnter);
-    target.addEventListener("mouseleave", this.boundOnMouseLeave);
+    target.on("mousedown", this.boundOnMouseDown);
+    target.on("mousemove", this.boundOnMouseMove);
+    target.on("mouseup", this.boundOnMouseUp);
   }
 
   detach() {
     if( !this._target ) return;
-    this._target.removeEventListener("mousedown", this.boundOnMouseDown);
-    this._target.removeEventListener("mousemove", this.boundOnMouseMove);
-    this._target.removeEventListener("mouseup", this.boundOnMouseUp);
-    this._target.removeEventListener("mouseenter", this.boundOnMouseEnter);
-    this._target.removeEventListener("mouseleave", this.boundOnMouseLeave);
+    this._target.off("mousedown", this.boundOnMouseDown);
+    this._target.off("mousemove", this.boundOnMouseMove);
+    this._target.off("mouseup", this.boundOnMouseUp);
     this._target = null;
   }
 
   boundOnMouseDown = this.onMouseDown.bind(this);
-  onMouseDown(e: MouseEvent) {
+  onMouseDown(e: InteractionEvent) {
     this.mouseDown = true;
     this.mousePosition = {
-      x: e.offsetX,
-      y: e.offsetY
+      x: e.data.global.x,
+      y: e.data.global.y
     };
   }
 
   boundOnMouseMove = this.onMouseMove.bind(this);
-  onMouseMove(e: MouseEvent) {
+  onMouseMove(e: InteractionEvent) {
     if( !this.mouseDown ) return;
     this.mousePosition = {
-      x: e.offsetX,
-      y: e.offsetY
+      x: e.data.global.x,
+      y: e.data.global.y
     };
+    for( let callback of this.dragCallbacks ){
+      callback({...this.mousePosition});
+    }
   }
 
   boundOnMouseUp = this.onMouseUp.bind(this);
-  onMouseUp(e: MouseEvent) {
+  onMouseUp(e: InteractionEvent) {
     this.mouseDown = false;
     this.mousePosition = null;
   }
 
-  boundOnMouseEnter = this.onMouseEnter.bind(this);
-  onMouseEnter(e: MouseEvent) {
-    //happens before move
+  onDrag(callback: (point: Point) => void){
+    if( !this.dragCallbacks.includes(callback) )
+      this.dragCallbacks.push(callback);
   }
 
-  boundOnMouseLeave = this.onMouseLeave.bind(this);
-  onMouseLeave(e: MouseEvent) {
-    //happens after move potentially
+  offDrag(callback: (point: Point) => void) {
+    this.dragCallbacks = this.dragCallbacks.filter(c => c !== callback);
   }
 }
 

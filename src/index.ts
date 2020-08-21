@@ -1,23 +1,25 @@
 import "@/style/index.scss";
-import {Application} from "pixi.js";
+import {Application, InteractionEvent, Rectangle} from "pixi.js";
 import Player from "./classes/entities/Player/Player";
 import Room from "./classes/entities/constructs/Room/Room";
 import {DEFAULT_ROOM_SIZE} from "./constants";
 import {RoomSide} from "./classes/entities/constructs/Room/types";
 import GameLoop from "./logic/GameLoop";
 import mouseDragHandler from "./logic/mouseDragHandler";
-import dragToMovePlayer from "./logic/interaction/gameLoopHooks/dragToMovePlayer";
+import dragToQueuePlayerMovement from "./logic/interaction/eventHooks/dragToQueuePlayerMovement";
 import GameState from "./logic/GameState";
+import clickToQueuePlayerMovement from "./logic/interaction/eventHooks/clickToQueuePlayerMovement";
+import {Point} from "./types";
+import movePlayerToQueueLocation from "./logic/interaction/gameLoopHooks/movePlayerToQueuedLocation";
 
 const app = new Application({
   width: 640,
   height: 480,
   backgroundColor: 0xE5E5E5
 });
-
-const container = document.querySelector(".app-container")
-if( container ) container.appendChild(app.view);
-else throw new Error("Unable to find container to mount application");
+app.stage.interactive = true;
+app.stage.hitArea = new Rectangle(0, 0, 640, 480);
+mouseDragHandler.attach(app.stage);
 
 const gameState = new GameState();
 gameState.player = new Player();
@@ -40,26 +42,24 @@ const room = new Room({
 app.stage.addChild(room.sprite);
 room.sprite.x = app.view.width/2;
 room.sprite.y = app.view.height/2;
-
-/**
- * TODO
- *
- * As a POC for seeing facing work and handling clicks updating user state,
- * determine the angle between the click point and the current position of the player.
- *
- * If the angle is within (45/2) degrees of a facing, set it as such.
- */
 /**
  * TODO
  *
  * Create a "pending travel to click" based on regular click
  */
 
+//Setup static event handlers
+app.stage.on("click", (e: InteractionEvent) => clickToQueuePlayerMovement(e, gameState));
+mouseDragHandler.onDrag((point: Point) => dragToQueuePlayerMovement(point, gameState));
+
+//Setup the gameLoop
 const gameLoop = new GameLoop(gameState);
-
-mouseDragHandler.attach(app.view);
-gameLoop.addHook(dragToMovePlayer);
-
+gameLoop.addHook(movePlayerToQueueLocation);
 app.ticker.add(delta => gameLoop.handler(delta));
+
+//Attach the app to the DOM
+const container = document.querySelector(".app-container")
+if( container ) container.appendChild(app.view);
+else throw new Error("Unable to find container to mount application");
 
 export {}
