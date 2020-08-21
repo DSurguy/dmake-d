@@ -6,6 +6,7 @@ import {DEFAULT_ROOM_SIZE} from "./constants";
 import {RoomSide} from "./classes/entities/constructs/Room/types";
 import {PlayerFacing} from "./classes/entities/Player/types";
 import GameLoop from "./logic/GameLoop";
+import mouseDragHandler from "./logic/mouseDragHandler";
 
 const app = new Application({
   width: 640,
@@ -47,11 +48,12 @@ room.sprite.y = app.view.height/2;
  */
 
 const gameLoop = new GameLoop();
-app.ticker.add(delta => gameLoop.handler(delta));
+
+mouseDragHandler.attach(app.view);
 gameLoop.addHook(delta => {
-  if( player.facing === PlayerFacing.upLeft )
-    player.facing = PlayerFacing.up;
-  else player.facing += 1;
-})
+  console.log(mouseDragHandler.mousePosition);
+});
+
+app.ticker.add(delta => gameLoop.handler(delta));
 
 export {}
