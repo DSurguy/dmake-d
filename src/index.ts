@@ -7,6 +7,8 @@ import {RoomSide} from "./classes/entities/constructs/Room/types";
 import {PlayerFacing} from "./classes/entities/Player/types";
 import GameLoop from "./logic/GameLoop";
 import mouseDragHandler from "./logic/mouseDragHandler";
+import angleBetweenPoints from "./utils/angleBetweenPoints";
+import {Point} from "./types";
 
 const app = new Application({
   width: 640,
@@ -46,12 +48,36 @@ room.sprite.y = app.view.height/2;
  *
  * If the angle is within (45/2) degrees of a facing, set it as such.
  */
+/**
+ * TODO
+ *
+ * Create a "pending travel to click" based on regular click
+ */
 
 const gameLoop = new GameLoop();
 
 mouseDragHandler.attach(app.view);
+const angleToFacing = [
+  [0, 22.5, PlayerFacing.left],
+  [45-22.5, 45+22.5, PlayerFacing.upLeft],
+  [90-22.5, 90+22.5, PlayerFacing.up],
+  [135-22.5, 135+22.5, PlayerFacing.upRight],
+  [180-22.5, 180+22.5, PlayerFacing.right],
+  [225-22.5, 225+22.5, PlayerFacing.downRight],
+  [270-22.5, 270+22.5, PlayerFacing.down],
+  [315-22.5, 315+22.5, PlayerFacing.downLeft],
+  [360-22.5, 360, PlayerFacing.left]
+];
 gameLoop.addHook(delta => {
-  console.log(mouseDragHandler.mousePosition);
+  if( mouseDragHandler.mousePosition ){
+    const angle = angleBetweenPoints(player.sprite.position as Point, mouseDragHandler.mousePosition);
+    for( let [lowerBound, upperBound, facing] of angleToFacing ){
+      if( angle >= lowerBound && angle < upperBound ){
+        player.facing = facing;
+        break;
+      }
+    }
+  }
 });
 
 app.ticker.add(delta => gameLoop.handler(delta));

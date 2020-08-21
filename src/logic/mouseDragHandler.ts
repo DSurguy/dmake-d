@@ -1,7 +1,10 @@
-type Point = {
-  x: number;
-  y: number;
-}
+import {Point} from "../types";
+
+/**
+ * TODO
+ *
+ * Handle zoom, it appears to skew these positions
+ */
 
 class MouseDragHandler {
   mousePosition: Point | null = null
