@@ -4,11 +4,10 @@ import Player from "./classes/entities/Player/Player";
 import Room from "./classes/entities/constructs/Room/Room";
 import {DEFAULT_ROOM_SIZE} from "./constants";
 import {RoomSide} from "./classes/entities/constructs/Room/types";
-import {PlayerFacing} from "./classes/entities/Player/types";
 import GameLoop from "./logic/GameLoop";
 import mouseDragHandler from "./logic/mouseDragHandler";
-import angleBetweenPoints from "./utils/angleBetweenPoints";
-import {Point} from "./types";
+import dragToMovePlayer from "./logic/interaction/gameLoopHooks/dragToMovePlayer";
+import GameState from "./logic/GameState";
 
 const app = new Application({
   width: 640,
@@ -20,10 +19,12 @@ const container = document.querySelector(".app-container")
 if( container ) container.appendChild(app.view);
 else throw new Error("Unable to find container to mount application");
 
-const player = new Player();
-app.stage.addChild(player.sprite);
-player.sprite.x = app.view.width/2;
-player.sprite.y = app.view.height/2;
+const gameState = new GameState();
+gameState.player = new Player();
+
+app.stage.addChild(gameState.player.sprite);
+gameState.player.sprite.x = app.view.width/2;
+gameState.player.sprite.y = app.view.height/2;
 
 const room = new Room({
   width: DEFAULT_ROOM_SIZE,
@@ -54,31 +55,10 @@ room.sprite.y = app.view.height/2;
  * Create a "pending travel to click" based on regular click
  */
 
-const gameLoop = new GameLoop();
+const gameLoop = new GameLoop(gameState);
 
 mouseDragHandler.attach(app.view);
-const angleToFacing = [
-  [0, 22.5, PlayerFacing.left],
-  [45-22.5, 45+22.5, PlayerFacing.upLeft],
-  [90-22.5, 90+22.5, PlayerFacing.up],
-  [135-22.5, 135+22.5, PlayerFacing.upRight],
-  [180-22.5, 180+22.5, PlayerFacing.right],
-  [225-22.5, 225+22.5, PlayerFacing.downRight],
-  [270-22.5, 270+22.5, PlayerFacing.down],
-  [315-22.5, 315+22.5, PlayerFacing.downLeft],
-  [360-22.5, 360, PlayerFacing.left]
-];
-gameLoop.addHook(delta => {
-  if( mouseDragHandler.mousePosition ){
-    const angle = angleBetweenPoints(player.sprite.position as Point, mouseDragHandler.mousePosition);
-    for( let [lowerBound, upperBound, facing] of angleToFacing ){
-      if( angle >= lowerBound && angle < upperBound ){
-        player.facing = facing;
-        break;
-      }
-    }
-  }
-});
+gameLoop.addHook(dragToMovePlayer);
 
 app.ticker.add(delta => gameLoop.handler(delta));
 
