@@ -5,6 +5,7 @@ import Room from "./classes/entities/constructs/Room/Room";
 import {DEFAULT_ROOM_SIZE} from "./constants";
 import {RoomSide} from "./classes/entities/constructs/Room/types";
 import {PlayerFacing} from "./classes/entities/Player/types";
+import GameLoop from "./logic/GameLoop";
 
 const app = new Application({
   width: 640,
@@ -44,5 +45,13 @@ room.sprite.y = app.view.height/2;
  *
  * If the angle is within (45/2) degrees of a facing, set it as such.
  */
+
+const gameLoop = new GameLoop();
+app.ticker.add(delta => gameLoop.handler(delta));
+gameLoop.addHook(delta => {
+  if( player.facing === PlayerFacing.upLeft )
+    player.facing = PlayerFacing.up;
+  else player.facing += 1;
+})
 
 export {}

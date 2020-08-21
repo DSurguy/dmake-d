@@ -3,7 +3,7 @@ import {playerSpriteFactory} from "./factories";
 import {PlayerFacing} from "./types";
 
 export default class Player extends Entity {
-  _facing: PlayerFacing = PlayerFacing.up;
+  private _facing: PlayerFacing = PlayerFacing.up;
 
   constructor() {
     super();
